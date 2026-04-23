@@ -12,186 +12,149 @@ LENDER_PAYOUTS = {
 }
 
 
-def render_styles():
+def prettify_option(value: str) -> str:
+    return str(value).replace("_", " ").strip().title()
+
+
+def option_labels(options: list[str]) -> dict[str, str]:
+    return {option: prettify_option(option) for option in options}
+
+
+def inject_css():
     st.markdown(
         """
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Sans+3:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-            :root {
-                --brand-navy: #102542;
-                --brand-slate: #1f3b57;
-                --brand-gold: #f2a65a;
-                --brand-cream: #f8f4ee;
-                --brand-mint: #d7efe8;
-                --brand-rose: #f6d8d4;
-                --text-dark: #132238;
-            }
+        html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-            .stApp {
-                background:
-                    radial-gradient(circle at top right, rgba(242, 166, 90, 0.20), transparent 28%),
-                    radial-gradient(circle at left top, rgba(215, 239, 232, 0.75), transparent 24%),
-                    linear-gradient(180deg, #f6efe5 0%, #fbfaf7 42%, #f3f7fa 100%);
-                color: var(--text-dark);
-                font-family: 'Source Sans 3', sans-serif;
-            }
+        .block-container {
+            padding-top: 1.5rem;
+            padding-bottom: 3rem;
+            max-width: 1100px;
+        }
 
-            .block-container {
-                padding-top: 2.2rem;
-                padding-bottom: 3rem;
-                max-width: 1180px;
-            }
+        /* ── Hero banner ── */
+        .hero {
+            border-radius: 20px;
+            padding: 2.4rem 2.6rem 2rem;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1849a9 100%);
+            margin-bottom: 2rem;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 0.28rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.14);
+            color: #bfd0f5;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.9rem;
+        }
+        .hero h1 {
+            margin: 0 0 0.55rem;
+            color: #ffffff !important;
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.06;
+            letter-spacing: -0.03em;
+        }
+        .hero p {
+            margin: 0 0 1.5rem;
+            color: rgba(255,255,255,0.78) !important;
+            font-size: 1.03rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        .hero-chips { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+        .hero-chip {
+            padding: 0.45rem 1rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #ffffff !important;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
 
-            h1, h2, h3 {
-                font-family: 'Space Grotesk', sans-serif;
-                letter-spacing: -0.03em;
-                color: var(--brand-navy);
-            }
+        /* ── Section headers ── */
+        .sec-hdr {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.5rem 0 0.2rem;
+        }
+        .sec-icon {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            background: #dbeafe;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        .sec-title {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #0d1b2a !important;
+        }
+        .sec-sub {
+            font-size: 0.88rem;
+            color: #64748b !important;
+            margin: 0.1rem 0 0.85rem;
+        }
 
-            .hero-shell {
-                position: relative;
-                overflow: hidden;
-                border: 1px solid rgba(16, 37, 66, 0.10);
-                border-radius: 28px;
-                padding: 2rem 2rem 1.5rem 2rem;
-                background: linear-gradient(135deg, rgba(16, 37, 66, 0.97), rgba(31, 59, 87, 0.92));
-                box-shadow: 0 22px 60px rgba(16, 37, 66, 0.16);
-                margin-bottom: 1.25rem;
-            }
+        /* ── Metric cards ── */
+        [data-testid="stMetric"] {
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 14px !important;
+            padding: 1rem 1.1rem !important;
+            background: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+        }
+        [data-testid="stMetricLabel"] p {
+            color: #475569 !important;
+            font-weight: 600 !important;
+            font-size: 0.82rem !important;
+        }
+        [data-testid="stMetricValue"] > div {
+            color: #0d1b2a !important;
+            font-weight: 700 !important;
+        }
 
-            .hero-shell::after {
-                content: "";
-                position: absolute;
-                inset: auto -60px -90px auto;
-                width: 260px;
-                height: 260px;
-                border-radius: 999px;
-                background: radial-gradient(circle, rgba(242, 166, 90, 0.28), rgba(242, 166, 90, 0));
-            }
+        /* ── Result boxes ── */
+        .result-box {
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin: 0.6rem 0 0.4rem;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .result-approved { background: #f0fdf4; border: 2px solid #22c55e; color: #14532d !important; }
+        .result-denied   { background: #fef2f2; border: 2px solid #ef4444; color: #7f1d1d !important; }
+        .result-review   { background: #fffbeb; border: 2px solid #f59e0b; color: #78350f !important; }
 
-            .hero-kicker {
-                display: inline-block;
-                margin-bottom: 0.7rem;
-                padding: 0.38rem 0.75rem;
-                border-radius: 999px;
-                background: rgba(255, 255, 255, 0.12);
-                color: #f7e7d1;
-                font-size: 0.84rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-            }
+        /* ── Progress bar ── */
+        .stProgress > div > div > div > div {
+            border-radius: 999px;
+            background: linear-gradient(90deg, #1849a9, #3b82f6) !important;
+        }
 
-            .hero-title {
-                margin: 0;
-                color: white;
-                font-size: 3rem;
-                line-height: 0.98;
-            }
-
-            .hero-copy {
-                max-width: 680px;
-                margin: 0.8rem 0 1.2rem 0;
-                color: rgba(255, 255, 255, 0.82);
-                font-size: 1.08rem;
-            }
-
-            .hero-stats {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.8rem;
-            }
-
-            .hero-stat {
-                min-width: 180px;
-                padding: 0.9rem 1rem;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 18px;
-                background: rgba(255, 255, 255, 0.09);
-                backdrop-filter: blur(4px);
-            }
-
-            .hero-stat-label {
-                color: rgba(255, 255, 255, 0.68);
-                font-size: 0.82rem;
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-            }
-
-            .hero-stat-value {
-                color: white;
-                font-family: 'Space Grotesk', sans-serif;
-                font-size: 1.4rem;
-                font-weight: 700;
-            }
-
-            .section-card {
-                border: 1px solid rgba(16, 37, 66, 0.09);
-                border-radius: 24px;
-                padding: 1.1rem 1.15rem 0.6rem 1.15rem;
-                background: rgba(255, 255, 255, 0.72);
-                box-shadow: 0 14px 42px rgba(16, 37, 66, 0.07);
-                backdrop-filter: blur(8px);
-                margin-bottom: 1rem;
-            }
-
-            .section-title {
-                margin: 0;
-                font-size: 1.25rem;
-                color: var(--brand-navy);
-            }
-
-            .section-copy {
-                margin: 0.2rem 0 0.7rem 0;
-                color: #516072;
-                font-size: 0.98rem;
-            }
-
-            .results-banner {
-                border: 1px solid rgba(16, 37, 66, 0.08);
-                border-radius: 24px;
-                padding: 1rem 1.15rem;
-                background: linear-gradient(135deg, rgba(255,255,255,0.82), rgba(247, 241, 232, 0.82));
-                box-shadow: 0 12px 36px rgba(16, 37, 66, 0.08);
-                margin: 0.75rem 0 1rem 0;
-            }
-
-            [data-testid="stMetric"] {
-                background: rgba(255, 255, 255, 0.82);
-                border: 1px solid rgba(16, 37, 66, 0.08);
-                border-radius: 22px;
-                padding: 1rem 1.1rem;
-                box-shadow: 0 12px 30px rgba(16, 37, 66, 0.06);
-            }
-
-            [data-testid="stSidebar"] {
-                background: linear-gradient(180deg, #fffdf9 0%, #f3f4ef 100%);
-                border-right: 1px solid rgba(16, 37, 66, 0.08);
-            }
-
-            .stButton > button {
-                border-radius: 999px;
-                border: none;
-                min-height: 3.1rem;
-                padding: 0.75rem 1.4rem;
-                font-weight: 700;
-                background: linear-gradient(135deg, #f2a65a, #eb7f57);
-                color: white;
-                box-shadow: 0 14px 28px rgba(235, 127, 87, 0.28);
-            }
-
-            .stButton > button:hover {
-                background: linear-gradient(135deg, #eb9951, #de6d48);
-            }
-
-            div[data-baseweb="slider"] > div > div {
-                background: linear-gradient(90deg, #f2a65a, #eb7f57);
-            }
-
-            .stProgress > div > div > div > div {
-                background: linear-gradient(90deg, #f2a65a, #eb7f57);
-            }
+        /* ── Predict button ── */
+        div[data-testid="stButton"] > button[kind="primary"] {
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            width: 100%;
+            background: linear-gradient(135deg, #1849a9, #3b82f6) !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(24,73,169,0.3) !important;
+        }
+        div[data-testid="stButton"] > button[kind="primary"]:hover {
+            background: linear-gradient(135deg, #1340a0, #2563eb) !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -201,40 +164,33 @@ def render_styles():
 def render_hero():
     st.markdown(
         """
-        <section class="hero-shell">
-            <div class="hero-kicker">Payout-Optimized Underwriting</div>
-            <h1 class="hero-title">LenderMatch Intelligence</h1>
-            <p class="hero-copy">
-                Evaluate applicant strength, estimate approval likelihood, and prioritize the lender
-                that offers the strongest expected return for each application.
+        <div class="hero">
+            <div class="hero-badge">BUS 458 &mdash; Loan Decision Intelligence</div>
+            <h1>LenderMatch Intelligence</h1>
+            <p>
+                Predict loan approval and identify which lender delivers the highest expected
+                payout for each applicant &mdash; built on a Decision Tree classifier
+                trained on real-world loan data.
             </p>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <div class="hero-stat-label">Primary Goal</div>
-                    <div class="hero-stat-value">Maximize Payout</div>
-                </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-label">Model Focus</div>
-                    <div class="hero-stat-value">Approval + Profitability</div>
-                </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-label">Decision Lens</div>
-                    <div class="hero-stat-value">Risk Aware</div>
-                </div>
+            <div class="hero-chips">
+                <div class="hero-chip">Maximize Total Payout</div>
+                <div class="hero-chip">Decision Tree Model</div>
+                <div class="hero-chip">Risk-Aware Scoring</div>
             </div>
-        </section>
+        </div>
         """,
         unsafe_allow_html=True,
     )
 
 
-def render_section_intro(title: str, copy: str):
+def section_header(icon: str, title: str, sub: str):
     st.markdown(
         f"""
-        <div class="section-card">
-            <h3 class="section-title">{title}</h3>
-            <p class="section-copy">{copy}</p>
+        <div class="sec-hdr">
+            <div class="sec-icon">{icon}</div>
+            <span class="sec-title">{title}</span>
         </div>
+        <p class="sec-sub">{sub}</p>
         """,
         unsafe_allow_html=True,
     )
@@ -291,107 +247,116 @@ def predict_for_lender(raw_values: dict, lender: str, model, model_feature_names
 
 
 def main():
-    st.set_page_config(page_title="Loan Approval App", layout="wide")
-    render_styles()
+    st.set_page_config(
+        page_title="LenderMatch Intelligence",
+        page_icon=":bar_chart:",
+        layout="wide",
+    )
+    inject_css()
     render_hero()
 
     base_dir = Path(__file__).parent
     default_model_path = base_dir / "my_model.pkl"
     default_csv_path = base_dir / "loan_data_analysis_final.csv"
 
+    # ── Sidebar ──────────────────────────────────────────────────
     with st.sidebar:
-        st.markdown("### Payout Reference")
-        st.caption("Use expected payout to decide which lender should receive the application first.")
+        st.markdown("#### Lender Payout Reference")
+        st.caption("Expected Payout = Approval Probability x Lender Payout")
         payout_df = pd.DataFrame(
-            [
-                {"Lender": lender, "Payout ($)": payout}
-                for lender, payout in LENDER_PAYOUTS.items()
-            ]
+            [{"Lender": k, "Max Payout ($)": v} for k, v in LENDER_PAYOUTS.items()]
         )
         st.dataframe(payout_df, use_container_width=True, hide_index=True)
+        st.divider()
+        with st.expander("Model Settings"):
+            model_path_text = st.text_input("Model (.pkl) path", value=str(default_model_path))
+            csv_path_text = st.text_input("Reference CSV path", value=str(default_csv_path))
 
-        with st.expander("Advanced Model Settings"):
-            model_path_text = st.text_input("Path to model (.pkl)", value=str(default_model_path))
-            csv_path_text = st.text_input("Optional path to reference CSV", value=str(default_csv_path))
-
+    # ── Load model ────────────────────────────────────────────────
     model_path = Path(model_path_text)
     csv_path = Path(csv_path_text)
 
     if not model_path.exists():
-        st.error(f"Model file was not found: {model_path}")
+        st.error(f"Model file not found: `{model_path}`")
         st.stop()
 
     model = load_model(model_path)
 
     if not hasattr(model, "feature_names_in_"):
-        st.error("This model does not expose feature_names_in_. Re-train with a pandas DataFrame and save again.")
+        st.error("Model does not expose `feature_names_in_`. Re-train using a pandas DataFrame.")
         st.stop()
 
     model_feature_names = list(model.feature_names_in_)
     ref_df = load_reference_data(csv_path)
 
+    # ── Option lists ──────────────────────────────────────────────
     reason_options = pick_options(
-        ref_df,
-        "Reason",
+        ref_df, "Reason",
         ["credit_card_refinancing", "debt_consolidation", "home_improvement", "major_purchase"],
     )
-    emp_status_options = pick_options(ref_df, "Employment_Status", ["full_time", "part_time", "self_employed", "unemployed"])
+    emp_status_options = pick_options(
+        ref_df, "Employment_Status",
+        ["full_time", "part_time", "self_employed", "unemployed"],
+    )
     emp_sector_options = pick_options(
-        ref_df,
-        "Employment_Sector",
+        ref_df, "Employment_Sector",
         ["information_technology", "healthcare", "finance", "consumer_discretionary"],
     )
     lender_options = pick_options(ref_df, "Lender", ["A", "B", "C"])
+
+    reason_labels = option_labels(reason_options)
+    emp_status_labels = option_labels(emp_status_options)
+    emp_sector_labels = option_labels(emp_sector_options)
 
     fico_default = numeric_default(ref_df, "FICO_score", 680)
     income_default = numeric_default(ref_df, "Monthly_Gross_Income", 5500)
     housing_default = numeric_default(ref_df, "Monthly_Housing_Payment", 1200)
     requested_default = numeric_default(ref_df, "Requested_Loan_Amount", 75000)
 
-    render_section_intro(
-        "Financial Information",
-        "Capture the core financial drivers that most strongly influence loan approval and payout value.",
-    )
+    # ── Financial Information ─────────────────────────────────────
     with st.container(border=True):
+        section_header(
+            "💰", "Financial Information",
+            "The primary drivers of approval likelihood and credit risk.",
+        )
         fin_col1, fin_col2 = st.columns(2)
-
         with fin_col1:
             fico_score = st.slider("FICO Score", 300, 850, value=int(fico_default))
             monthly_gross_income = st.number_input(
-                "Monthly Gross Income ($)",
-                min_value=0.0,
-                value=float(income_default),
-                step=100.0,
+                "Monthly Gross Income ($)", min_value=0.0, value=float(income_default), step=100.0,
             )
-
         with fin_col2:
             monthly_housing_payment = st.number_input(
-                "Monthly Housing Payment ($)",
-                min_value=0.0,
-                value=float(housing_default),
-                step=25.0,
+                "Monthly Housing Payment ($)", min_value=0.0, value=float(housing_default), step=25.0,
             )
             requested_loan_amount = st.number_input(
-                "Requested Loan Amount ($)",
-                min_value=0.0,
-                value=float(requested_default),
-                step=500.0,
+                "Requested Loan Amount ($)", min_value=0.0, value=float(requested_default), step=500.0,
             )
 
-    render_section_intro(
-        "Application Details",
-        "Complete the profile with application context so the model can compare lenders on both risk and return.",
-    )
+    # ── Application Details ───────────────────────────────────────
     with st.container(border=True):
+        section_header(
+            "📋", "Application Details",
+            "Complete the profile so the model can compare lenders on risk and return.",
+        )
         app_col1, app_col2 = st.columns(2)
-
         with app_col1:
-            reason = st.selectbox("Loan Reason", reason_options)
-            employment_status = st.radio("Employment Status", emp_status_options)
-            ever_bankrupt = st.radio("Ever Bankrupt or Foreclose?", ["No", "Yes"], horizontal=True)
-
+            reason = st.selectbox(
+                "Loan Reason", reason_options,
+                format_func=lambda o: reason_labels.get(o, o),
+            )
+            employment_status = st.radio(
+                "Employment Status", emp_status_options,
+                format_func=lambda o: emp_status_labels.get(o, o),
+            )
+            ever_bankrupt = st.radio(
+                "Ever Bankrupt or Foreclose?", ["No", "Yes"], horizontal=True,
+            )
         with app_col2:
-            employment_sector = st.selectbox("Employment Sector", emp_sector_options)
+            employment_sector = st.selectbox(
+                "Employment Sector", emp_sector_options,
+                format_func=lambda o: emp_sector_labels.get(o, o),
+            )
             selected_lender = st.radio("Lender", lender_options, horizontal=True)
 
     raw_values = {
@@ -406,91 +371,98 @@ def main():
         "Lender": selected_lender,
     }
 
-    if st.button("Predict Approval", type="primary"):
+    st.markdown("<br>", unsafe_allow_html=True)
+    predict_clicked = st.button("Run Prediction", type="primary")
+
+    if predict_clicked:
         model_input = build_model_input(raw_values, model_feature_names)
         prediction = int(model.predict(model_input)[0])
+        prob_approved = (
+            float(model.predict_proba(model_input)[0][1])
+            if hasattr(model, "predict_proba") else None
+        )
 
-        prob_approved = None
-        if hasattr(model, "predict_proba"):
-            prob_approved = float(model.predict_proba(model_input)[0][1])
-
+        # Build lender comparison first so best-lender metric is available
         comparison_rows = []
         for lender in lender_options:
             pred_class, pred_prob = predict_for_lender(raw_values, lender, model, model_feature_names)
-            expected_payout = None
-            if pred_prob is not None:
-                expected_payout = pred_prob * LENDER_PAYOUTS.get(lender, 0)
-
-            comparison_rows.append(
-                {
-                    "Lender": lender,
-                    "Predicted Decision": "Approved" if pred_class == 1 else "Denied",
-                    "Approval Probability": pred_prob if pred_prob is not None else float("nan"),
-                    "Expected Payout": expected_payout if expected_payout is not None else float("nan"),
-                }
+            expected_payout = (
+                pred_prob * LENDER_PAYOUTS.get(lender, 0)
+                if pred_prob is not None else float("nan")
             )
+            comparison_rows.append({
+                "Lender": lender,
+                "Decision": "Approved" if pred_class == 1 else "Denied",
+                "Approval Probability": pred_prob if pred_prob is not None else float("nan"),
+                "Expected Payout ($)": expected_payout,
+            })
 
         comparison_df = pd.DataFrame(comparison_rows)
-        if comparison_df["Expected Payout"].notna().any():
-            comparison_df = comparison_df.sort_values(by="Expected Payout", ascending=False)
-        elif comparison_df["Approval Probability"].notna().any():
-            comparison_df = comparison_df.sort_values(by="Approval Probability", ascending=False)
-
-        st.markdown(
-            """
-            <div class="results-banner">
-                <h3 class="section-title">Decision Summary</h3>
-                <p class="section-copy">Review approval strength first, then choose the lender with the best expected payout.</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        sort_col = (
+            "Expected Payout ($)"
+            if comparison_df["Expected Payout ($)"].notna().any()
+            else "Approval Probability"
         )
+        comparison_df = comparison_df.sort_values(by=sort_col, ascending=False).reset_index(drop=True)
 
-        top_metrics = st.columns(2)
-        if prob_approved is not None:
-            top_metrics[0].metric("Approval Likelihood", f"{prob_approved:.2%}")
-        else:
-            top_metrics[0].metric("Approval Likelihood", "N/A")
+        st.divider()
 
-        if comparison_df["Expected Payout"].notna().any():
-            best_row = comparison_df.iloc[0]
-            top_metrics[1].metric(
-                "Best Recommended Lender",
-                str(best_row["Lender"]),
-                delta=f"Expected payout ${best_row['Expected Payout']:.2f}",
+        # ── Headline metrics ──────────────────────────────────────
+        m1, m2, m3 = st.columns(3)
+        m1.metric(
+            "Approval Likelihood",
+            f"{prob_approved:.1%}" if prob_approved is not None else "N/A",
+        )
+        best_row = comparison_df.iloc[0]
+        m2.metric(
+            "Best Lender",
+            f"Lender {best_row['Lender']}",
+            delta=(
+                f"${best_row['Expected Payout ($)']:.2f} expected"
+                if pd.notna(best_row["Expected Payout ($)"])
+                else None
+            ),
+        )
+        m3.metric("Max Available Payout", f"${LENDER_PAYOUTS.get(best_row['Lender'], 0)}")
+
+        # ── Decision result ───────────────────────────────────────
+        if prediction == 1:
+            st.markdown(
+                '<div class="result-box result-approved">&#x2713;&nbsp; Prediction: Approved</div>',
+                unsafe_allow_html=True,
+            )
+        elif prob_approved is not None and 0.4 <= prob_approved <= 0.6:
+            st.markdown(
+                '<div class="result-box result-review">&#x26A0;&nbsp; Borderline &mdash; Manual Review Recommended</div>',
+                unsafe_allow_html=True,
             )
         else:
-            top_metrics[1].metric("Best Recommended Lender", str(selected_lender))
-
-        st.subheader("Prediction")
-        if prediction == 1:
-            st.success("Prediction: Approved")
-        elif prob_approved is not None and 0.4 <= prob_approved <= 0.6:
-            st.warning("Prediction: Borderline case. Manual review recommended.")
-        else:
-            st.error("Prediction: Denied")
+            st.markdown(
+                '<div class="result-box result-denied">&#x2715;&nbsp; Prediction: Denied</div>',
+                unsafe_allow_html=True,
+            )
 
         if prob_approved is not None:
+            st.caption(f"Approval probability: {prob_approved:.2%}")
             st.progress(prob_approved)
-            st.write(f"Approval probability: {prob_approved:.2%}")
 
-        st.subheader("Lender Comparison")
+        # ── Lender comparison table ───────────────────────────────
+        st.markdown("#### Lender Comparison")
         display_df = comparison_df.copy()
-        if display_df["Approval Probability"].notna().any():
-            display_df["Approval Probability"] = display_df["Approval Probability"].map(lambda value: f"{value:.2%}" if pd.notna(value) else "N/A")
-        if display_df["Expected Payout"].notna().any():
-            display_df["Expected Payout"] = display_df["Expected Payout"].map(lambda value: f"${value:.2f}" if pd.notna(value) else "N/A")
-
+        display_df["Approval Probability"] = display_df["Approval Probability"].map(
+            lambda v: f"{v:.1%}" if pd.notna(v) else "N/A"
+        )
+        display_df["Expected Payout ($)"] = display_df["Expected Payout ($)"].map(
+            lambda v: f"${v:.2f}" if pd.notna(v) else "N/A"
+        )
         st.dataframe(display_df, use_container_width=True, hide_index=True)
 
-        if comparison_df["Expected Payout"].notna().any():
-            top_lender = comparison_df.iloc[0]["Lender"]
-            top_value = comparison_df.iloc[0]["Expected Payout"]
-            st.info(f"Best lender to prioritize: {top_lender} (${top_value:.2f} expected payout)")
-        elif comparison_df["Approval Probability"].notna().any():
-            top_lender = comparison_df.iloc[0]["Lender"]
-            top_prob = comparison_df.iloc[0]["Approval Probability"]
-            st.info(f"Best lender to prioritize: {top_lender} ({top_prob:.2%} approval probability)")
+        top_lender = comparison_df.iloc[0]["Lender"]
+        top_ev = comparison_df.iloc[0]["Expected Payout ($)"]
+        if pd.notna(top_ev):
+            st.success(f"Prioritize **Lender {top_lender}** — highest expected payout of **${top_ev:.2f}**")
+        else:
+            st.info(f"Prioritize Lender {top_lender}")
 
 
 if __name__ == "__main__":
